@@ -1,13 +1,107 @@
 ---
-title: Kubernetes Challenges
+title: Kubernetes Challenges Parte 1
 author: Kubernetes Guatemala
 date: 2023-03-17
 extensions:
 - file_loader
 - terminal
 ---
+## Prerequisitos
+### Configurar autentication de usuario
+```bash
+# revisamos el estado de nuestro cluster
+kubectl cluster-info
+```
 
-# Reto 1
+```bash
+mkdir csr/
+```
+```bash
+openssl genrsa -out $(pwd)/martin.key 4096
+```
+
+---
+### Archivo de configuracion para el CSR
+
+creamos el archivo `csr/martin.csr.cnf` con el siguiente contenido
+```ini
+[ req ]
+default_bits = 2048
+prompt = no
+default_md = sha256 # algoritmo de encriptacion
+distinguished_name = dn
+[ dn ]
+CN = martin
+O = developers
+[ v3_ext ]
+authorityKeyIdentifier=keyid,issuer:always
+basicConstraints=CA:FALSE
+keyUsage=keyEncipherment,dataEncipherment
+extendedKeyUsage=serverAuth,clientAuth
+```
+---
+### Creamos el Certificate Signing Request
+```bash
+openssl req -config csr/martin.csr.conf -new -key martin.key -nodes -out csr/martin.csr
+```
+#### ... Y verificamos
+
+```bash
+openssl req -in csr/martin.csr
+```
+---
+### CSR para K8s
+Creamos el archivo `martin-csr.yaml` con el siguiente contenido
+
+```yaml
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: martin-cluster-authentication
+spec:
+  groups:
+    - system:authenticated
+  request: $(cat $(pwd)/csr/martin.csr | base64 | tr -d '\n')
+  signerName: kubernetes.io/kube-apiserver-client
+  usages:
+  - client auth
+```
+
+... Y aplicamos el manifiesto
+```bash
+kubectl apply -f martin-csr.yaml
+```
+
+---
+
+Revisamos que fue lo que se creo en cluster
+```bash
+kubectl get csr
+```
+Procedemos a firmar el Certificate Signing Request
+
+```bash
+kubectl certificate approve martin-cluster-authentication
+```
+... Y descargamos el certificado
+
+```bash
+kubectl get csr martin-cluster-authentication -o jsonpath='{.status.certificate}' | base64 --decode > martin.pem
+```
+
+Verificamos el contenido del certificado
+```bash
+openssl x509 -in martin.pem -noout -text
+```
+En nuestro workspace tenemos que encontrar los siguientes archivos
+```bash
+key.crt martin.crt
+```
+
+Documentacion: **[managing-tls-in-a-cluster](https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/)** 
+
+---
+## Reto 1
 
 <!-- stop -->
 
@@ -37,49 +131,38 @@ extensions:
 
 <!-- stop -->
 
-```file
-path: ./commands/commandlist.sh
-relative: true
-lang: bash
-lines:
-  start: 0
-  end: 5
+```bash
+kubectl config set-credentials martin \
+--client-certificate=/root/martin.crt \
+--client-key=/root/martin.key \
+--embed-certs=true
 ```
 
 <!-- stop -->
 `--client-certificate` Indica la ruta del certificado del cliente que fue firmado por el cluster
 `--client-key` Indica la ruta de la llave del certificado del cliente
 
-
-
-
 <!-- stop -->
 
-*No se de que estas hablando o que estas haciendo?*
-
+Documentacion y ejemplos
 [Kubernetes RBAC with examples](https://sysdig.com/learn-cloud-native/kubernetes-security/kubernetes-rbac/)
 
-<!-- stop -->
-
-*Terminos que puedo buscar para entender mejor este paso del ejercicio
+*Terminos que puedo buscar
 
 * Kubernetes User Accounts
 * RBAC
 * SSL Basics
-* Kubeconfig Contexts
 
 ---
 ## Configurar un nuevo contexto `developer` con el usuario `martin` y el cluster
 
 <!-- stop -->
 
-```file
-path: ./commands/commandlist.sh
-relative: true
-lang: bash
-lines:
-  start: 5
-  end: 9
+```bash
+kubectl config set-context developer \
+--cluster=kubernetes \
+--user=martin \
+--namespace=development
 ```
 
 ---
@@ -87,13 +170,11 @@ lines:
 
 <!-- stop -->
 
-```file
-path: ./commands/commandlist.sh
-relative: true
-lang: bash
-lines:
-  start: 10
+```bash
+kubectl config-context development
 ```
+
+Documentacion: [organize-cluster-access-kubeconfig](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/)
 
 ---
 ## Permisos
@@ -102,75 +183,23 @@ lines:
 
 ### Crear `developer role`
 
-<!-- stop -->
-
-```file
-path: ./challenge01.yaml
-lang: yaml
-lines:
-  start: 1
-  end: 2
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: development
+  name: developer-role
+rules:
+  - apiGroups
+    - ""
+    resources:
+    - persistentvolumeclaims
+    - services
+    - pods
+    verbs:
+    - "*"
 ```
-
-<!-- stop -->
-
-
-```file
-path: ./challenge01.yaml
-lang: yaml
-lines:
-  start: 2
-  end: 3
-```
-<!-- stop -->
-
-```file
-path: ./challenge01.yaml
-lang: yaml
-lines:
-  start: 3
-  end: 6
-```
-<!-- stop -->
-
-```file
-path: ./challenge01.yaml
-lang: yaml
-lines:
-  start: 6
-  end: 7 
-```
-<!-- stop -->
-
-```file
-path: ./challenge01.yaml
-lang: yaml
-lines:
-  start: 7
-  end: 9
-```
-<!-- stop -->
-
-```file
-path: ./challenge01.yaml
-lang: yaml
-lines:
-  start: 9
-  end: 13
-```
-
-<!-- stop -->
-
-
-```file
-path: ./challenge01.yaml
-lang: yaml
-lines:
-  start: 13
-  end: 15
-```
-
-
+Documentacion: [rbac-good-practices](https://kubernetes.io/docs/concepts/security/rbac-good-practices/)
 ---
 ### Crear `developer role binding`
 
@@ -181,7 +210,7 @@ lines:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: challenge01binding
+  name: developer-rolebinding
   namespace: development
 subjects:
 - kind: User
@@ -189,21 +218,49 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
-  name: challenge01
+  name: developer-role
   apiGroup: rbac.authorization.k8s.io
 ```
+
+Documentacion: [rbac](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+
 ---
 ##  Aplicacion Jekyll
 
 <!-- stop -->
+## Creamos un Persistent Volume
 
-### Revisar el Persistent Volume
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+name: jekyll-site
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 1Gi
+  local:
+    path: /mnt/jekyll-site
+  nodeAffinity:
+    required:
+    nodeSelectorTerms:
+    - matchExpressions:
+    - key: kubernetes.io/hostname
+    operator: In
+    values:
+    - minikube
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+```
+
+Revisar el Persistent Volume
 <!-- stop -->
-
 
 ```bash
 kubectl get persistentvolumes -n development
 ```
+
 ---
 ### Crear un Persistent Volume Claim que use el Persistent Volume anterior
 
@@ -224,10 +281,12 @@ spec:
     requests:
       storage: 1Gi
 ```
+Documentacion: [persistent-volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) 
 ---
 ### Crear el Pod
 
 #### El Pod
+
 ```yaml
 ---
 apiVersion: v1
@@ -271,7 +330,7 @@ spec:
       - mountPath: /site
         name: site
 ```
-
+Documentacion: [pods](https://kubernetes.io/docs/concepts/workloads/pods/)
 ---
 ### Exponer el Pod via un Service
 
@@ -293,3 +352,4 @@ spec:
   selector:
     run: jekyll
 ```
+Documentacion: [Service](https://kubernetes.io/docs/concepts/services-networking/service/)
