@@ -101,7 +101,7 @@ key.crt martin.crt
 Documentacion: **[managing-tls-in-a-cluster](https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/)** 
 
 ---
-## Reto 1
+## Reto 1 | Descripcion
 
 <!-- stop -->
 
@@ -282,6 +282,7 @@ spec:
       storage: 1Gi
 ```
 Documentacion: [persistent-volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) 
+
 ---
 ### Crear el Pod
 
@@ -331,10 +332,13 @@ spec:
         name: site
 ```
 Documentacion: [pods](https://kubernetes.io/docs/concepts/workloads/pods/)
+
 ---
+
 ### Exponer el Pod via un Service
 
 <!-- stop -->
+
 
 ```yaml
 ---
