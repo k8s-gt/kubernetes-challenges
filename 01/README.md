@@ -6,6 +6,36 @@ extensions:
 - file_loader
 - terminal
 ---
+## ***Quien es Marvin Velasques?  ***
+
+  Self thought engineer trabajando para PayPal
+
+  Apasionado de la tecnologia y lo que tenga que ver con automatizacion
+
+󱃾  CKA
+
+  Amigo de los gatos y la naturaleza
+
+󱈏  Esposo y papa de tres niños
+
+               @PuesSiVos | 󰌻 @mvlsqz |  @mvlsqz 
+
+---
+## De que se trata esta charla
+Una serie de ejercicios para des enpolvar nuestras habilidades
+con kubernetes
+
+Descubrir cosas que tal vez no recordabamos o no sabiamos
+
+Y para los nuevos una demo de como funciona K8s
+
+
+---
+## Disclaimer 
+La idea es original de la plataforma KodeKloud
+
+
+---
 ## Prerequisitos
 ### Configurar autentication de usuario
 ```bash
@@ -357,3 +387,12 @@ spec:
     run: jekyll
 ```
 Documentacion: [Service](https://kubernetes.io/docs/concepts/services-networking/service/)
+
+---
+## Reto 02 | Descripcion
+
+### Arreglar la comunicacion con el servidor de K8s
+### Arreglar la el kube-api-server
+### Arreglar el deployment de coredns
+### Reparar el nodo01
+### Preparar un servidor de archivos usando los objetos PV, PVC, Pod y Service
