@@ -14,9 +14,7 @@ extensions:
 
 󱃾  CKA
 
-  Amigo de los gatos y la naturaleza
-
-󱈏  Esposo y papa de tres niños
+   󱈏 
 
                @PuesSiVos | 󰌻 @mvlsqz |  @mvlsqz 
 
