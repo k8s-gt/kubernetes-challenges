@@ -385,12 +385,3 @@ spec:
     run: jekyll
 ```
 Documentacion: [Service](https://kubernetes.io/docs/concepts/services-networking/service/)
-
----
-## Reto 02 | Descripcion
-
-### Arreglar la comunicacion con el servidor de K8s
-### Arreglar la el kube-api-server
-### Arreglar el deployment de coredns
-### Reparar el nodo01
-### Preparar un servidor de archivos usando los objetos PV, PVC, Pod y Service
