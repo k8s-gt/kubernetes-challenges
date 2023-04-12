@@ -5,6 +5,7 @@ date: 2023-03-17
 extensions:
 - file_loader
 - terminal
+
 ---
 ## ***Quien es Marvin Velasques?  ***
 
@@ -20,12 +21,12 @@ extensions:
 
 ---
 ## De que se trata esta charla
-Una serie de ejercicios para des enpolvar nuestras habilidades
-con kubernetes
+Una serie de ejercicios para desenpolvar nuestras habilidades
+con Kubernetes
 
 Descubrir cosas que tal vez no recordabamos o no sabiamos
 
-Y para los nuevos una demo de como funciona K8s
+Y para los nuevos una demo de como funciona Kubernetes
 
 
 ---
@@ -34,7 +35,7 @@ La idea es original de la plataforma KodeKloud
 
 
 ---
-## Prerequisitos
+## Prerequisitos para el reto 1
 ### Configurar autentication de usuario
 ```bash
 # revisamos el estado de nuestro cluster
@@ -78,7 +79,7 @@ openssl req -config csr/martin.csr.conf -new -key martin.key -nodes -out csr/mar
 openssl req -in csr/martin.csr
 ```
 ---
-### CSR para K8s
+### CSR para Kubernetes
 Creamos el archivo `martin-csr.yaml` con el siguiente contenido
 
 ```yaml
@@ -129,7 +130,7 @@ key.crt martin.crt
 Documentacion: **[managing-tls-in-a-cluster](https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/)** 
 
 ---
-## Reto 1 | Descripcion
+## Reto 1 | Configurando RBAC para que un desarrollador pueda desplegar una aplicacion con persistencia
 
 <!-- stop -->
 

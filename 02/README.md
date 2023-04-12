@@ -4,7 +4,7 @@ author: Kubernetes Guatemala
 date: 2023-03-17
 ---
 
-## Reto 02 | Descripcion
+## Reto 02 | Reparando un cluster roto
 
 ```mermaid
 stateDiagram
