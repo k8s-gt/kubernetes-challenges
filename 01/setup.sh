@@ -1,3 +1,4 @@
+minikube profile challenge01
 mkdir csr/
 
 openssl genrsa -out $(pwd)/martin.key 4096
