@@ -1,3 +1,4 @@
+minikube start -p challenge01
 minikube profile challenge01
 mkdir csr/
 
@@ -40,7 +41,5 @@ kubectl apply -f martin-csr.yaml
 kubectl certificate approve martin-cluster-authentication
 
 kubectl get csr martin-cluster-authentication -o jsonpath='{.status.certificate}' | base64 --decode > martin.pem
-
 rm -rf csr martin-csr.yaml
-
-ls
+ls martin.key  martin.pem
