@@ -1,4 +1,5 @@
-minikube start -p challenge01
+#!/bin/bash
+
 minikube profile challenge01
 mkdir csr/
 
